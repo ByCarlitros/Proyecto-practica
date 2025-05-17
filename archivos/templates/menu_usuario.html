@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestión de Solicitudes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+
+        .btn-agregar, .btn-menu-admin {
+            position: fixed;
+            font-size: 1rem;
+            padding: 1rem 2rem;
+            background-color: transparent;
+            color: #009CFF;
+            border: 2px solid #009CFF;
+            border-radius: 5px;
+            box-shadow: none;
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .btn-agregar {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .btn-menu-admin {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .btn-agregar:hover, .btn-menu-admin:hover {
+            background-color: #009CFF;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 156, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        .list-container {
+            margin-top: 2rem;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+        }
+
+        .modal-header, .modal-footer {
+            background-color: #282828;
+        }
+
+        .modal-body {
+            background-color: #1e1e1e;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestión de Solicitudes</h1>
+
+    <!-- Botón para agregar solicitud -->
+    <a href="#" class="btn btn-agregar" data-bs-toggle="modal" data-bs-target="#agregarSolicitudModal">
+        ➕ Agregar Solicitud
+    </a>
+
+    <!-- Botón para ir al menú de administración -->
+    <a href="{% url 'menu_admin' %}" class="btn btn-menu-admin">
+        ⬅ Volver al Menú de Administración
+    </a>
+
+    <!-- Mensaje de error -->
+    {% if error %}
+    <div class="alert alert-danger mt-3" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Lista de archivos -->
+    <div class="list-container">
+        <h2>Lista de Solicitudes</h2>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Usuario</th>
+                    <th>Nombre Archivo</th>
+                    <th>Fuente</th>
+                    <th>Lugar</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Fecha Actualización</th>
+                    <th>Estado</th>
+                    <th>Validado Por</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for solicitud in archivos %}
+                <tr>
+                    <td>{{ solicitud.id }}</td>
+                    <td>{{ solicitud.nombre_usuario }}</td>
+                    <td>{{ solicitud.nombre_archivo }}</td>
+                    <td>{{ solicitud.fuente }}</td>
+                    <td>{{ solicitud.lugar }}</td>
+                    <td>{{ solicitud.fecha_subida }}</td>
+                    <td>{{ solicitud.fecha_actualizacion }}</td>
+                    <td>
+                        {% if solicitud.estado == 1 %}
+                            En revisión
+                        {% elif solicitud.estado == 2 %}
+                            Aprobado
+                        {% elif solicitud.estado == 3 %}
+                            Rechazado
+                        {% endif %}
+                    </td>
+                    <td>{{ solicitud.validado_por|default:"Ninguno" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9">No hay solicitudes registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para agregar solicitud -->
+    <div class="modal fade" id="agregarSolicitudModal" tabindex="-1" aria-labelledby="agregarSolicitudModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarSolicitudModalLabel">Agregar Solicitud</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nombre_usuario" class="form-label">Nombre Usuario</label>
+                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre_archivo" class="form-label">Nombre Archivo</label>
+                            <input type="text" class="form-control" id="nombre_archivo" name="nombre_archivo" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="fuente" class="form-label">Fuente</label>
+                            <input type="text" class="form-control" id="fuente" name="fuente" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="lugar" class="form-label">Lugar</label>
+                            <input type="text" class="form-control" id="lugar" name="lugar" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_actualizacion" class="form-label">Fecha de Actualización</label>
+                            <input type="datetime-local" class="form-control" id="fecha_actualizacion" name="fecha_actualizacion" value="{{ today }}" />
+                        </div>
+                        <!-- Campos ocultos -->
+                        <input type="hidden" name="estado" value="1" />
+                        <input type="hidden" name="validado_por" value="Ninguno" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Subir Solicitud</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="exitoModal" tabindex="-1" aria-labelledby="exitoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exitoModalLabel">¡Solicitud Subida con Éxito!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    La solicitud ha sido subida exitosamente.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% if solicitud_exitosa %}
+    <script>
+        const exitoModal = new bootstrap.Modal(document.getElementById('exitoModal'));
+        exitoModal.show();
+    </script>
+    {% endif %}
+</body>
+</html>
