@@ -10,7 +10,7 @@ class Solicitud(models.Model):
 
     nombre_usuario = models.CharField(max_length=255)
     nombre_archivo = models.CharField(max_length=255)
-    validado_por = models.CharField(max_length=255, blank=True, null=True)
+    validado_por = models.CharField(max_length=255, default="Ninguno")
     fecha_subida = models.DateTimeField(default=datetime.now)  # Cambié a DateTimeField
     fecha_actualizacion = models.DateTimeField()  # Cambié a DateTimeField
     fuente = models.CharField(max_length=255)

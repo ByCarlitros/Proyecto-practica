@@ -7,62 +7,148 @@
     <title>Gestión de Solicitudes</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <style>
+        :root {
+            --color-primary: #1558A5;       /* Principal: azul intenso */
+            --color-secondary: #DDEFE6;     /* Secundario: fondo claro */
+            --color-accent: #819B61;        /* Acento positivo: verde */
+            --color-alert: #8D5C5A;         /* Acento negativo: rojo */
+            --color-neutral-light: #AE999B; /* Neutro claro: beige */
+            --color-neutral-dark: #82A1AF;  /* Neutro oscuro: gris azulado */
+        }
+
         body {
-            background-color: #121212;
-            color: white;
+            background-color: var(--color-secondary);
+            color: #333333;
             font-family: 'Segoe UI', sans-serif;
             padding: 2rem;
         }
 
-        .btn-agregar, .btn-menu-admin {
+        h1, h2 {
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Botones flotantes */
+        .btn-agregar {
             position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--color-primary);
+            color: white;
+            border: 2px solid var(--color-primary);
             font-size: 1rem;
             padding: 1rem 2rem;
-            background-color: transparent;
-            color: #009CFF;
-            border: 2px solid #009CFF;
             border-radius: 5px;
-            box-shadow: none;
             transition: all 0.3s ease;
             z-index: 9999;
         }
 
-        .btn-agregar {
-            bottom: 20px;
-            right: 20px;
-        }
-
         .btn-menu-admin {
+            position: fixed;
             bottom: 20px;
             left: 20px;
+            background-color: white;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            font-size: 1rem;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            z-index: 9999;
         }
 
-        .btn-agregar:hover, .btn-menu-admin:hover {
-            background-color: #009CFF;
-            color: white;
-            box-shadow: 0 0 15px rgba(0, 156, 255, 0.8);
+        .btn-agregar:hover {
+            background-color: #0e4a8f;
+            border-color: #0e4a8f;
+            box-shadow: 0 0 15px rgba(21, 88, 165, 0.5);
             transform: scale(1.05);
         }
 
-        .list-container {
-            margin-top: 2rem;
-        }
-
-        .modal-content {
-            background-color: #1e1e1e;
-        }
-
-        .modal-header, .modal-footer {
-            background-color: #282828;
-        }
-
-        .modal-body {
-            background-color: #1e1e1e;
-        }
-
-        .alert-success {
-            background-color: #28a745;
+        .btn-menu-admin:hover {
+            background-color: var(--color-primary);
             color: white;
+            box-shadow: 0 0 15px rgba(21, 88, 165, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Tabla */
+        .table {
+            background-color: white;
+            border: 1px solid var(--color-neutral-light);
+            margin-top: 1rem;
+        }
+
+        .table thead th {
+            background-color: var(--color-primary);
+            color: white;
+            border-bottom: 2px solid var(--color-neutral-dark);
+        }
+
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: rgba(221, 239, 230, 0.4);
+        }
+
+        /* Estados */
+        .estado-revision { 
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+        .estado-aprobado { 
+            color: var(--color-accent);
+            font-weight: 500;
+        }
+        .estado-rechazado { 
+            color: var(--color-alert);
+            font-weight: 500;
+        }
+
+        /* Modales */
+        .modal-content {
+            background-color: white;
+            border: 2px solid var(--color-primary);
+        }
+
+        .modal-header {
+            background-color: var(--color-primary);
+            color: white;
+            border-bottom: 1px solid var(--color-neutral-dark);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--color-neutral-light);
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #0e4a8f;
+            border-color: #0e4a8f;
+        }
+
+        /* Alertas */
+        .alert-success {
+            background-color: var(--color-accent);
+            color: white;
+            border-color: #739955;
+        }
+
+        .alert-danger {
+            background-color: var(--color-alert);
+            color: white;
+            border-color: #7c514f;
+        }
+
+        /* Formularios */
+        .form-control {
+            border: 1px solid var(--color-neutral-light);
+        }
+
+        .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 0.25rem rgba(21, 88, 165, 0.25);
         }
     </style>
 </head>
@@ -86,10 +172,10 @@
     </div>
     {% endif %}
 
-    <!-- Lista de archivos aaaa -->
+    <!-- Lista de archivos -->
     <div class="list-container">
         <h2>Lista de Solicitudes</h2>
-        <table class="table table-dark table-striped">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -115,11 +201,11 @@
                     <td>{{ solicitud.fecha_actualizacion }}</td>
                     <td>
                         {% if solicitud.estado == 1 %}
-                            En revisión
+                            <span class="estado-revision">En revisión</span>
                         {% elif solicitud.estado == 2 %}
-                            Aprobado
+                            <span class="estado-aprobado">Aprobado</span>
                         {% elif solicitud.estado == 3 %}
-                            Rechazado
+                            <span class="estado-rechazado">Rechazado</span>
                         {% endif %}
                     </td>
                     <td>{{ solicitud.validado_por|default:"Ninguno" }}</td>
@@ -164,7 +250,6 @@
                             <label for="fecha_actualizacion" class="form-label">Fecha de Actualización</label>
                             <input type="datetime-local" class="form-control" id="fecha_actualizacion" name="fecha_actualizacion" value="{{ today }}" />
                         </div>
-                        <!-- Campos ocultos -->
                         <input type="hidden" name="estado" value="1" />
                         <input type="hidden" name="validado_por" value="Ninguno" />
                     </div>
@@ -189,13 +274,12 @@
                     La solicitud ha sido subida exitosamente.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="background-color: var(--color-accent); border-color: var(--color-accent);">Aceptar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     {% if solicitud_exitosa %}
