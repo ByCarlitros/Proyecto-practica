@@ -7,6 +7,9 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.utils.timezone import make_aware, is_naive
 
+from django.utils.timezone import now
+from datetime import timedelta
+
 def menu_usuario(request):
     if request.method == "POST":
         nombre_usuario = request.POST.get("nombre_usuario")
@@ -92,3 +95,42 @@ def actualizar_solicitud(request):
         return HttpResponseRedirect(url)
 
     return redirect('menu_admin')
+
+def menu_consolidado(request):
+    solicitudes = Solicitud.objects.all()
+
+    datos_consolidado = []
+    for solicitud in solicitudes:
+        if solicitud.fecha_actualizacion:
+            dias_restantes = (solicitud.fecha_actualizacion - now()).days
+            dias_restantes_abs = abs(dias_restantes)
+
+            if dias_restantes > 7:
+                estado_color = 'green'
+                mensaje = f'Faltan {dias_restantes} días'
+            elif 1 <= dias_restantes <= 7:
+                estado_color = 'yellow'
+                mensaje = f'Quedan {dias_restantes} días'
+            elif dias_restantes == 0:
+                estado_color = 'orange'
+                mensaje = '¡Es hoy!'
+            else:
+                estado_color = 'red'
+                mensaje = f'Se pasaron por {dias_restantes_abs} días'
+        else:
+            estado_color = 'gray'
+            mensaje = 'Sin fecha'
+            dias_restantes = None
+            dias_restantes_abs = None
+
+        datos_consolidado.append({
+            'solicitud': solicitud,
+            'estado_color': estado_color,
+            'mensaje': mensaje,
+            'dias_restantes': dias_restantes,
+            'dias_restantes_abs': dias_restantes_abs,
+        })
+
+    return render(request, 'menu_consolidado.html', {
+        'datos_consolidado': datos_consolidado
+    })

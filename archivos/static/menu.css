@@ -32,3 +32,71 @@ body {
     color: #121212;
     box-shadow: 0 0 15px #0dcaf0;
 }
+.dias-verde {
+    color: var(--color-accent) !important;
+    font-weight: bold;
+    background-color: transparent !important;
+}
+
+.dias-amarillo {
+    color: #d1a900 !important;
+    font-weight: bold;
+    background-color: transparent !important;
+}
+
+.dias-naranja {
+    color: orange !important;
+    font-weight: bold;
+    background-color: transparent !important;
+}
+
+.dias-rojo {
+    color: var(--color-alert) !important;
+    font-weight: bold;
+    background-color: transparent !important;
+}
+.btn-cambiar-vista {
+    position: fixed;
+    bottom: 20px;
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem;
+    background-color: white;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    z-index: 1050;
+}
+
+.btn-cambiar-vista:hover {
+    background-color: var(--color-primary);
+    color: white;
+    box-shadow: 0 0 15px rgba(21, 88, 165, 0.3);
+}
+.contenedor-botones-fixed {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 1050;
+    flex-wrap: wrap;
+}
+
+.btn-cambiar-vista {
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-cambiar-vista:hover {
+    background-color: #0056b3;
+    color: white;
+}

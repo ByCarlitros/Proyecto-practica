@@ -164,7 +164,10 @@
     <a href="{% url 'menu_admin' %}" class="btn btn-menu-admin">
         ⬅ Volver al Menú de Administración
     </a>
-
+        <!-- Botón fijo centrado abajo -->
+    <a href="{% url 'menu_consolidado' %}" class="btn btn-menu-admin" style="left: 50%; transform: translateX(-50%);">
+    📋 Ir a Consolidado
+    </a>
     <!-- Mensaje de error -->
     {% if error %}
     <div class="alert alert-danger mt-3" role="alert">

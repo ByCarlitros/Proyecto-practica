@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vista Consolidada</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        :root {
+            --color-primary: #1558A5;
+            --color-secondary: #DDEFE6;
+            --color-accent: #819B61;
+            --color-alert: #8D5C5A;
+            --color-neutral-light: #AE999B;
+            --color-neutral-dark: #82A1AF;
+
+            --verde: #4CAF50;
+            --amarillo: #FFC107;
+            --naranja: #FF9800;
+            --rojo: #F44336;
+        }
+
+        body {
+            background-color: var(--color-secondary);
+            color: #333;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+
+        h1, h2 {
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-volver {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: white;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .btn-volver:hover {
+            background-color: var(--color-primary);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(21, 88, 165, 0.3);
+        }
+
+        .table {
+            background-color: white;
+            border: 1px solid var(--color-neutral-light);
+            margin-top: 1rem;
+        }
+
+        .table thead th {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: rgba(221, 239, 230, 0.4);
+        }
+
+        .contador-verde {
+            background-color: var(--verde);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .contador-amarillo {
+            background-color: var(--amarillo);
+            color: black;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .contador-naranja {
+            background-color: var(--naranja);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .contador-rojo {
+            background-color: var(--rojo);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <h1>Vista Consolidada de Solicitudes</h1>
+
+    <!-- Botón para volver -->
+    <<div class="contenedor-botones-fixed">
+  <a href="{% url 'menu_consolidado' %}" class="btn btn-cambiar-vista">Ir a Consolidado</a>
+  <a href="{% url 'menu_usuario' %}" class="btn btn-cambiar-vista">Cambiar a Vista Usuario</a>
+</div>
+
+
+    <div class="list-container">
+        <h2>Estado de Actualización</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Solicitante</th>
+                    <th>Solicitud</th>
+                    <th>Departamento</th>
+                    <th>Lugar</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Fecha Actualización</th>
+                    <th>Validado Por</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in datos_consolidado %}
+                <tr>
+                    <td>{{ item.solicitud.id }}</td>
+                    <td>{{ item.solicitud.nombre_usuario }}</td>
+                    <td>{{ item.solicitud.nombre_archivo }}</td>
+                    <td>{{ item.solicitud.lugar }}</td>
+                    <td>{{ item.solicitud.fuente }}</td>
+                    <td>{{ item.solicitud.fecha_subida }}</td>
+                    <td>{{ item.solicitud.fecha_actualizacion }}</td>
+                    <td>{{ item.solicitud.validado_por }}</td>
+                    <td>
+    {% if item.dias_restantes is not None %}
+        {% if item.dias_restantes > 7 %}
+            <span class="text-success fw-bold">Quedan {{ item.dias_restantes }} días restantes</span>
+        {% elif item.dias_restantes > 0 %}
+            <span class="text-warning fw-bold">Quedan {{ item.dias_restantes }} días restantes</span>
+        {% elif item.dias_restantes == 0 %}
+            <span class="text-orange fw-bold">¡Actualizar hoy!</span>
+        {% else %}
+            <span class="text-danger fw-bold">¡Vencido hace {{ item.dias_restantes_abs }} días!</span>
+        {% endif %}
+    {% else %}
+        <span class="text-secondary">Sin fecha</span>
+    {% endif %}
+</td>
+
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9">No hay solicitudes disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
