@@ -1,29 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Solicitud
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils import timezone
-
 from django.http import HttpResponseRedirect
-from django.utils.timezone import make_aware, is_naive
+from django.utils.timezone import make_aware, is_naive, now
 
-from django.utils.timezone import now
-from datetime import timedelta
+# ✅ Función auxiliar para convertir texto a PascalCase
+def to_pascal_case(texto):
+    return ''.join(p.capitalize() for p in texto.split())
 
 def menu_usuario(request):
     if request.method == "POST":
-        nombre_usuario = request.POST.get("nombre_usuario")
-        nombre_archivo = request.POST.get("nombre_archivo")
-        fuente = request.POST.get("fuente")
-        lugar = request.POST.get("lugar")
+        nombre_usuario = to_pascal_case(request.POST.get("nombre_usuario", "").strip())
+        nombre_archivo = to_pascal_case(request.POST.get("nombre_archivo", "").strip())
+        fuente = to_pascal_case(request.POST.get("fuente", "").strip())
+        lugar = to_pascal_case(request.POST.get("lugar", "").strip())
         fecha_actualizacion = request.POST.get("fecha_actualizacion")
-        validado_por = request.POST.get("validado_por", "Ninguno")
+        validado_por = to_pascal_case(request.POST.get("validado_por", "Ninguno").strip())
 
         if not (nombre_usuario and nombre_archivo and fuente and lugar and fecha_actualizacion):
             return render(request, "menu_usuario.html", {
                 "archivos": Solicitud.objects.all().order_by("-fecha_subida"),
                 "error": "Todos los campos son requeridos.",
-                "today": timezone.now().strftime('%Y-%m-%dT%H:%M'),  # formato para input datetime-local
+                "today": timezone.now().strftime('%Y-%m-%dT%H:%M'),
             })
 
         try:
@@ -67,8 +67,8 @@ def actualizar_solicitud(request):
 
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
 
-        solicitud.validado_por = request.POST.get('validado_por', '').strip()
-        solicitud.comentario = request.POST.get('comentario', '').strip()
+        solicitud.validado_por = to_pascal_case(request.POST.get('validado_por', '').strip())
+        solicitud.comentario = to_pascal_case(request.POST.get('comentario', '').strip())
 
         estado_post = request.POST.get('estado')
         try:
@@ -85,9 +85,6 @@ def actualizar_solicitud(request):
                 solicitud.fecha_actualizacion = fecha_actualizacion
             except (ValueError, TypeError):
                 pass
-        else:
-            # Si no se entrega fecha, no se modifica el campo
-            pass
 
         solicitud.save()
 
